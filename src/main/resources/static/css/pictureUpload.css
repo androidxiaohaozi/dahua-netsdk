@@ -1,0 +1,101 @@
+.hb-index {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.hb-index .content .hb-title {
+  font-size: 14px;
+  color: #747474;
+  font-weight: normal;
+  margin: 15px 0;
+}
+.hb-index .content .hb-examine {
+  font-size: 14px;
+  color: #747474;
+  font-weight: normal;
+  margin: 15px 0;
+}
+.hb-index .content .hb-sahngchuan {
+  width: 74px;
+  height: 74px;
+  font-size: 14px;
+  line-height: 30px;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+}
+.hb-index .content .hb-sahngchuan img {
+  width: 74px;
+  height: 74px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.hb-index .content .hb-sahngchuan #file {
+  width: 74px;
+  height: 74px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  z-index: 3;
+}
+.hb-index .content .hb-sahngchuan .sc-img {
+  cursor: pointer;
+}
+.hb-index .content .hb-img-box .img-box {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  display: inline-block;
+  margin: 10px 10px 10px 0;
+}
+.hb-index .content .hb-img-box .img-box .hb-img {
+  width: 60px;
+  height: 60px;
+}
+.hb-index .content .hb-img-box .img-box .img-del {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  position: absolute;
+  left: 48px;
+  top: -8px;
+}
+.hb-index .content .hb-text textarea {
+  height: 100px;
+  width: 97%;
+  resize: none;
+  overflow: hidden;
+  padding: 5px;
+  border-color: #e8e8e8;
+}
+.hb-index .content .hb-btn {
+  width: 100px;
+  height: 30px;
+  font-size: 14px;
+  line-height: 30px;
+  background: #2687d8;
+  text-align: center;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #fff;
+  margin-top: 25px;
+}
+.hb-index .content .no-btn {
+  background: #8c939d;
+}
+.hb-index .content .preview {
+  width: 60%;
+  height: auto;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+.hb-index .content .preview img {
+  width: 100%;
+}

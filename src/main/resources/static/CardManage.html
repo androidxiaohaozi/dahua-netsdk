@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <form onchange="change">
+        序号：
+        <input type="text" name="serialNumber">
+        <br>
+        卡号：
+        <input type="text" name="cardNo">
+        <br>
+        用户id：
+        <input type="text" name="userId">
+        <br>
+        卡名：
+        <input type="text" name="cardName">
+        <br>
+        卡密码：
+        <input type="password" name="cardPasswd">
+        <br>
+        卡状态：
+        <select name="cardStatus">
+            <option value="-1">未知</option>
+            <option value="0">正常</option>
+            <option value="1">挂失</option>
+            <option value="2">注销</option>
+            <option value="3">冻结</option>
+            <option value="4">欠费</option>
+            <option value="5">预期</option>
+            <option value="6">预欠费</option>
+        </select>
+        <br>
+        卡状态命名:
+        <input type="text" name="cardType">
+        <br>
+        卡类型：
+        <select name="cardType">
+            <option value="-1">未知</option>
+            <option value="0">一般卡</option>
+            <option value="1">VIP卡</option>
+            <option value="2">来宾卡</option>
+            <option value="3">巡逻卡</option>
+            <option value="4">黑名单卡</option>
+            <option value="5">胁迫卡</option>
+            <option value="6">巡逻卡</option>
+            <option value="7">母卡</option>
+        </select>
+        <br>
+        卡状态名称：
+        <input type="text" name="cardTypeName">
+        <br>
+        使用次数，仅当卡类型为来宾卡时有效：
+        <input type="text" name="useTimes">
+        <br>
+        是否首卡：
+        <select name="firstEnter">
+            <option value="0">不是</option>
+            <option value="1">是</option>
+        </select>
+        <br>
+        是否有效：
+        <select name="enable">
+            <option value="0">不是</option>
+            <option value="1">是</option>
+        </select>
+        <br>
+        有效期开始时间：
+        <input type="datetime-local" name="startTime">
+        <br>
+        有效期结束时间：
+        <input type="datetime-local" name="endTime">
+        <br>
+        记录集编号：
+        <input type="number" name="recordNo">
+        <br>
+        上传人脸照片：
+        <input type="file" name="face" accept="image/*">
+    </form>
+
+<script>
+    var change = function(){
+        var file = event.target.files[0];
+        var fileReader = new FileReader();
+
+        fileReader.onload = function(){
+            var result = this.result;
+            var blob = new Blob([result],{type:file.type});
+            var formData = new FormData();
+            formData.append('userAvatar',blob,file.name);　　　　　　　//添加其他表单字段
+            formData.append('username',document.getElementById("uname").value)
+            formData.append('pwd',document.getElementById("upwd").value);
+            $.ajax({
+                type:"post",
+                url:"http://localhost:3000/uploads",
+                async:true,
+                processData:false,
+                contentType:false,
+                data:formData,
+                timeout:6000,
+                success:function (data) {
+                    console.log('upload success')
+                },
+                error:function (xhr,text) {
+                    if(text === 'timeout'){
+                        xhr.abort();
+                    }
+                }
+            });
+        }
+        fileReader.readAsArrayBuffer(file);
+    }
+</script>
+</body>
+</html>

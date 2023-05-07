@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>卡管理</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <link href="css/base.css" rel="stylesheet">
+    <link href="css/element.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/element-ui-index.css">
+    <link href="css/pictureUpload.css" rel="stylesheet">
+</head>
+<style>
+    body {
+        width: 100vw;
+        height: 100vh;
+    }
+
+    #app {
+        width: 100vw;
+        height: 100vh;
+        overflow-x: hidden;
+        overflow-y: scroll;
+     }
+
+    .Partition {
+        width: 100%;
+        height: 0.5px;
+        background-color: #c5d0db;
+        margin: 8px auto;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
+    }
+
+    .el-table tr {
+        text-align: center;
+        height: 66px;
+        border-bottom: 1px solid #c5d0db;
+    }
+
+    .el-table tr td {
+        text-align: center;
+        height: 66px;
+        border-bottom: 1px solid #c5d0db;
+    }
+
+    .el-table thead tr th {
+        border-bottom: 1px solid #c5d0db;
+    }
+
+    .el-input {
+        width: 85%;
+    }
+
+    .el-dialog {
+        margin-top: 3vh !important;
+    }
+
+    @media (min-width: 0px) and (max-width: 768px) {
+        .el-table tr {
+            text-align: center;
+            height: 66px;
+            border-bottom: 1px solid #c5d0db;
+        }
+
+        .el-table tr td {
+            text-align: center;
+            height: 66px;
+            border-bottom: 1px solid #c5d0db;
+        }
+
+        .el-table .cell {
+            font-size: 12px;
+        }
+    }
+</style>
+<body>
+<div id="app">
+    <div id="pc">
+        <el-button type="primary" icon="el-icon-search" @click="tableDateList()" style="margin: 1.3% 1% 0 1.3%">搜索
+        </el-button>
+        <el-button type="warning" icon="el-icon-plus" style="margin: 1.3% 1% 0 0" @click="insert">新增</el-button>
+        <div class="Partition"></div>
+        <el-table stripe style="width: 100%;" border tooltip-effect="dark" ref="DischargeTable"
+                  :data="tableData">
+            <el-table-column fixed label="序号" align="center" width="150">
+                <template slot-scope="scope">{{ scope.row.serialNumber}}</template>
+            </el-table-column>
+            <el-table-column fixed label="卡号" align="center" width="150">
+                <template slot-scope="scope">{{ scope.row.cardNo }}</template>
+            </el-table-column>
+            <el-table-column fixed label="用户Id" align="center" width="150">
+                <template slot-scope="scope">{{ scope.row.userId }}</template>
+            </el-table-column>
+            <el-table-column fixed label="卡名" align="center" width="150">
+                <template slot-scope="scope">{{ scope.row.cardName }}</template>
+            </el-table-column>
+            <el-table-column label="卡密码" align="center" width="150">
+                <template slot-scope="scope">{{ scope.row.cardPasswd }}</template>
+            </el-table-column>
+            <el-table-column label="卡状态" align="center" width="150" :formatter="cardStatusTextFormat">
+            </el-table-column>
+            <el-table-column label="卡状态名称" align="center" width="150">
+                <template slot-scope="scope">{{ scope.row.cardStatusName }}</template>
+            </el-table-column>
+            <el-table-column label="卡类型" align="center" width="150" :formatter="cardTypeTextFormat">
+            </el-table-column>
+            <el-table-column label="卡类型名称" align="center" width="150">
+                <template slot-scope="scope">{{ scope.row.cardTypeName }}</template>
+            </el-table-column>
+            <el-table-column label="使用次数" align="center" width="150">
+                <template slot-scope="scope">{{ scope.row.useTimes }}</template>
+            </el-table-column>
+            <el-table-column label="是否首卡" align="center" width="150" :formatter="firstEnterTextFormat">
+            </el-table-column>
+            <el-table-column label="是否有效" align="center" width="150" :formatter="enableTextFormat">
+            </el-table-column>
+            <el-table-column label="有效期开始时间" align="center" width="150">
+                <template slot-scope="scope">{{ scope.row.startTime }}</template>
+            </el-table-column>
+            <el-table-column label="有效期结束时间" align="center" width="150">
+                <template slot-scope="scope">{{ scope.row.endTime }}</template>
+            </el-table-column>
+            <el-table-column label="记录集编号" align="center" width="150">
+                <template slot-scope="scope">{{ scope.row.recordNo }}</template>
+            </el-table-column>
+            <el-table-column fixed="right" label="操作" align="center" width="150">
+                <template slot-scope="scope">
+                    <el-button type="primary" size="mini" @click="xiugai(scope.row)">修改</el-button>
+                    <el-button type="danger" size="mini" @click="BatchDelete(scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+
+    <!-- 新增界面 -->
+    <el-dialog title="新增卡信息" :visible.sync="Mask" width="96%" :close-on-click-modal="false" class="dialog-style">
+        <el-form ref="addForm" :model="form" :rules="rules" label-width="20%">
+            <el-form-item label="序号：" prop="serialNumber">
+                <el-input v-model="form.serialNumber"></el-input>
+            </el-form-item>
+
+            <el-form-item label="卡号：" prop="cardNo">
+                <el-input v-model="form.cardNo"></el-input>
+            </el-form-item>
+
+            <el-form-item label="用户id：" prop="userId">
+                <el-input v-model="form.userId"></el-input>
+            </el-form-item>
+
+            <el-form-item label="卡名：" prop="cardName">
+                <el-input v-model="form.cardName"></el-input>
+            </el-form-item>
+
+            <el-form-item label="卡密码：" prop="cardPasswd">
+                <el-input v-model="form.cardPasswd"></el-input>
+            </el-form-item>
+
+            <el-form-item label="卡状态：" prop="cardStatus">
+                <el-select v-model="form.cardStatus">
+                    <el-option value="-1" label="未知">未知</el-option>
+                    <el-option value="0" label="正常">正常</el-option>
+                    <el-option value="1" label="正常">挂失</el-option>
+                    <el-option value="2" label="正常">注销</el-option>
+                    <el-option value="3" label="正常">冻结</el-option>
+                    <el-option value="4" label="正常">欠费</el-option>
+                    <el-option value="5" label="正常">逾期</el-option>
+                    <el-option value="6" label="正常">预欠费</el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="卡状态名称：" prop="cardStatusName">
+                <el-input v-model="form.cardStatusName"></el-input>
+            </el-form-item>
+
+            <el-form-item label="卡类型：" prop="cardType">
+                <el-select v-model="form.cardType">
+                    <el-option value="-1" label="未知">未知</el-option>
+                    <el-option value="0" label="正常">已办卡</el-option>
+                    <el-option value="1" label="正常">一般卡</el-option>
+                    <el-option value="2" label="正常">VIP卡</el-option>
+                    <el-option value="3" label="正常">来宾卡</el-option>
+                    <el-option value="4" label="正常">黑名单卡</el-option>
+                    <el-option value="5" label="正常">胁迫卡</el-option>
+                    <el-option value="6" label="正常">巡检卡</el-option>
+                    <el-option value="7" label="正常">母卡</el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="卡类型名称：" prop="cardTypeName">
+                <el-input v-model="form.cardTypeName"></el-input>
+            </el-form-item>
+
+            <el-form-item label="使用次数，仅当卡类型为来宾卡时有效：" prop="useTimes">
+                <el-input v-model="form.useTimes"></el-input>
+            </el-form-item>
+
+            <el-form-item label="是否首卡：" prop="firstEnter">
+                <el-select v-model="form.firstEnter">
+                    <el-option value="0" label="不是">不是</el-option>
+                    <el-option value="1" label="是">是</el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="是否有效：" prop="enable">
+                <el-select v-model="form.enable">
+                    <el-option value="0" label="不是">不是</el-option>
+                    <el-option value="1" label="是">是</el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="有效开始时间：" prop="startTime">
+                <el-date-picker
+                        v-model="form.startTime"
+                        type="datetime"
+                        format="yyyy-MM-dd HH:mm:ss"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        placeholder="选择日期时间">
+                </el-date-picker>
+            </el-form-item>
+
+            <el-form-item label="有效结束时间：" prop="endTime">
+                <el-date-picker
+                        v-model="form.endTime"
+                        type="datetime"
+                        format="yyyy-MM-dd HH:mm:ss"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        placeholder="选择日期时间">
+                </el-date-picker>
+            </el-form-item>
+
+            <el-form-item label="记录集编号：" prop="recordNo">
+                <el-input v-model="form.recordNo"></el-input>
+            </el-form-item>
+
+            <el-form-item label="工种：" prop="typeOfWork">
+                <el-input v-model="form.typeOfWork"></el-input>
+            </el-form-item>
+            <el-form-item label="分包：" prop="subpackage">
+                <el-input v-model="form.subpackage"></el-input>
+            </el-form-item>
+
+            <el-form-item prop="fileList" label="人员照片：">
+                <el-upload :action="uploadFileUrl" multiple list-type="picture-card" :data="fileData" name="file"
+                           accept="image/jpeg,image/png,image/jpg" :on-preview="handlePictureCardPreview"
+                           :file-list="ffileList" :on-remove="handleRemove"
+                           :on-success="handleimg" :before-remove="beforeRemove">
+                    <i class="el-icon-plus"></i>
+                    <template #tip>
+                        <div class="el-upload__tip">只能上传jpg/png/jpeg文件，且单个不超过2M</div>
+                    </template>
+                </el-upload>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+                <el-button size="mini" @click="uploadClosed">取 消</el-button>
+                <el-button size="mini" type="primary" @click="addOpen">确 定</el-button>
+        </span>
+    </el-dialog>
+
+    <!-- 修改界面 -->
+    <el-dialog title="修改日常检查" :visible.sync="Mask1" width="96%" :close-on-click-modal="false" class="dialog-style">
+        <el-form ref="addForm" :model="form" :rules="rules" label-width="20%">
+            <el-form-item label="时间：" prop="inspectionTime">
+                <el-date-picker
+                        v-model="form.inspectionTime"
+                        type="datetime"
+                        format="yyyy-MM-dd HH:mm:ss"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        placeholder="选择日期时间">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="单位：" prop="company">
+                <el-input v-model="form.company"></el-input>
+            </el-form-item>
+            <el-form-item label="人员：" prop="personnel">
+                <el-input v-model="form.personnel"></el-input>
+            </el-form-item>
+            <el-form-item label="职务：" prop="post">
+                <el-input v-model="form.post"></el-input>
+            </el-form-item>
+            <el-form-item label="重点检查单位：" prop="keyInspectionPoints">
+                <el-input v-model="form.keyInspectionPoints"></el-input>
+            </el-form-item>
+            <el-form-item label="内容及问题：" prop="contentsProblems">
+                <el-input v-model="form.contentsProblems"></el-input>
+            </el-form-item>
+            <el-form-item label="备注：" prop="inspectionRemark">
+                <el-input v-model="form.inspectionRemark"></el-input>
+            </el-form-item>
+            <el-form-item prop="ffileList" label="现场照片：">
+                <el-upload :action="uploadFileUrl" multiple list-type="picture-card" :data="fileData" name="file"
+                           accept="image/jpeg,image/png,image/jpg" :on-preview="handlePictureCardPreview"
+                           :file-list="ffileList" :on-remove="handleRemove"
+                           :on-success="handleimg" :before-remove="beforeRemove">
+                    <i class="el-icon-plus"></i>
+                    <template #tip>
+                        <div class="el-upload__tip">只能上传jpg/png/jpeg文件，且单个不超过2M</div>
+                    </template>
+                </el-upload>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+                <el-button size="mini" @click="uploadClosed">取 消</el-button>
+                <el-button size="mini" type="primary" @click="changeCrrunt">确 定</el-button>
+            </span>
+    </el-dialog>
+    <el-dialog :visible.sync="dialogVisible">
+        <img width="100%" :src="dialogImageUrl" alt="">
+    </el-dialog>
+
+    <!-- mobile查看全部-->
+    <el-dialog title="查看全部" :visible.sync="Mask6" width="96%" :close-on-click-modal="false" class="dialog-style">
+        <el-table stripe style="width: 100%;" tooltip-effect="dark" ref="DischargeTable" :data="tableData">
+            <el-table-column label="序号" align="center" width="55px">
+                <template slot-scope="scope">
+                    {{ scope.$index + 1 }}
+                </template>
+            </el-table-column>
+            <el-table-column label="时间" align="center">
+                <template scope="scope">{{ scope.row.inspectionTime }}</template>
+            </el-table-column>
+            <el-table-column label="单位" align="center">
+                <template scope="scope">{{ scope.row.company }}</template>
+            </el-table-column>
+            <el-table-column label="人员" align="center">
+                <template scope="scope">{{ scope.row.personnel }}</template>
+            </el-table-column>
+            <el-table-column label="职务" align="center">
+                <template scope="scope">{{ scope.row.post }}</template>
+            </el-table-column>
+            <el-table-column label="重点检查单位" align="center">
+                <template scope="scope">{{ scope.row.keyInspectionPoints }}</template>
+            </el-table-column>
+            <el-table-column label="内容及问题" align="center">
+                <template scope="scope">{{ scope.row.contentsProblems }}</template>
+            </el-table-column>
+            <el-table-column label="备注" align="center">
+                <template scope="scope">{{ scope.row.inspectionRemark }}</template>
+            </el-table-column>
+        </el-table>
+        <el-pagination background @current-change="handleCurrentChange" :page-size="pageSize"
+                       :total="total" layout="total, prev, pager, next" :current-page.sync="pageNum"
+                       style="margin: 2% 0;text-align: right;">
+        </el-pagination>
+        <span slot="footer" class="dialog-footer">
+                <el-button size="mini" @click="uploadClosed">关 闭</el-button>
+            </span>
+    </el-dialog>
+</div>
+</body>
+
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="js/vue-resource.js"></script>
+<script type="text/javascript" src="js/element.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.0.js"></script>
+<script type="text/javascript" src="js/mobileFix.mini.js"></script>
+<script type="text/javascript" src="js/exif.js"></script>
+<script type="text/javascript" src="js/lrz.js"></script>
+<script type="text/javascript" src="js/api.js"></script>
+<script type="text/javascript" src="js/dateFind.js"></script>
+<script src="js/viewer.js"></script>
+</html>

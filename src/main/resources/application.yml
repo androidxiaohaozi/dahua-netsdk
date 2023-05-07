@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+#minio图片服务器
+minio:
+  ## 以下仅仅本机测试,项目中不同文件肯定肯定存放的位置不一样，所以bocket（桶名也是不固定的）
+  url: http://49.233.61.24:9000 #生产环境
+  accessKey: minioadmin
+  secretKey: minioadmin
+  addBucket: file #minio桶
+  officalUrl: http://49.233.61.24:9000 # 测试环境
+
+#同步到系统的接口
+cardManageAddUrl: http://bimzcjh.cn:8002/cardManage/add
+cardManageUpdateUrl: http://bimzcjh.cn:9002/cardManage/update
+cardManageDeleteUrl: http://bimzcjh.cn:9002/cardManage/delete
+#同步门禁出入记录
+accessControlRecordsUrl: http://bimzcjh.cn:9002/accessControlRecords/add
+
+# Sa-Token-Quick-Login 配置
+sa:
+  # 登录账号
+  name: admin
+  # 登录密码
+  pwd: 123456
+  # 是否自动随机生成账号密码 (此项为true时, name与pwd失效)
+  auto: false
+  # 是否开启全局认证(关闭后将不再强行拦截)
+  auth: true
+  # 登录页标题
+  title: Asurplus 登录
+  # 是否显示底部版权信息
+  copr: true
+  # 指定拦截路径
+  include: /**
+  # 指定排除路径
+  exclude: /test
