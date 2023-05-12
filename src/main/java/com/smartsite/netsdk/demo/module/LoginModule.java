@@ -20,6 +20,16 @@ public class LoginModule {
 	
 	// 登陆句柄
 	public static NetSDKLib.LLong m_hLoginHandle = new NetSDKLib.LLong(0);
+
+	// 17登陆句柄
+	public static NetSDKLib.LLong m_17hLoginHandle = new NetSDKLib.LLong(0);
+	// 26登陆句柄
+	public static NetSDKLib.LLong m_26hLoginHandle = new NetSDKLib.LLong(0);
+	// 28登陆句柄
+	public static NetSDKLib.LLong m_28hLoginHandle = new NetSDKLib.LLong(0);
+	// 29登陆句柄
+	public static NetSDKLib.LLong m_29hLoginHandle = new NetSDKLib.LLong(0);
+
 	
 	private static boolean bInit    = false;
 	private static boolean bLogopen = false;
@@ -100,7 +110,7 @@ public class LoginModule {
 	 * 登录设备
 	 * \endif
 	 */
-	public static boolean login(String m_strIp, int m_nPort, String m_strUser, String m_strPassword) {	
+	public static boolean login(String m_strIp, int m_nPort, String m_strUser, String m_strPassword) {
 		//IntByReference nError = new IntByReference(0);
 		//入参
 		NetSDKLib.NET_IN_LOGIN_WITH_HIGHLEVEL_SECURITY pstInParam=new NetSDKLib.NET_IN_LOGIN_WITH_HIGHLEVEL_SECURITY();
@@ -111,15 +121,50 @@ public class LoginModule {
 		//出参
 		NetSDKLib.NET_OUT_LOGIN_WITH_HIGHLEVEL_SECURITY pstOutParam=new NetSDKLib.NET_OUT_LOGIN_WITH_HIGHLEVEL_SECURITY();
 		pstOutParam.stuDeviceInfo=m_stDeviceInfo;
-		//m_hLoginHandle = netsdk.CLIENT_LoginEx2(m_strIp, m_nPort, m_strUser, m_strPassword, 0, null, m_stDeviceInfo, nError);		
-		m_hLoginHandle=netsdk.CLIENT_LoginWithHighLevelSecurity(pstInParam, pstOutParam);
-		if(m_hLoginHandle.longValue() == 0) {
-			System.err.printf("Login Device[%s] Port[%d]Failed. %s\n", m_strIp, m_nPort, ToolKits.getErrorCodePrint());
-		} else {
-			System.out.println("Login Success [ " + m_strIp + " ]");
-		}	
-		
-		return m_hLoginHandle.longValue() == 0? false:true;
+		//m_hLoginHandle = netsdk.CLIENT_LoginEx2(m_strIp, m_nPort, m_strUser, m_strPassword, 0, null, m_stDeviceInfo, nError);
+		if ("192.168.1.247".equals(m_strIp)) {
+			m_hLoginHandle=netsdk.CLIENT_LoginWithHighLevelSecurity(pstInParam, pstOutParam);
+			if(m_hLoginHandle.longValue() == 0) {
+				System.err.printf("Login Device[%s] Port[%d]Failed. %s\n", m_strIp, m_nPort, ToolKits.getErrorCodePrint());
+			} else {
+				System.out.println("Login Success [ " + m_strIp + " ]");
+			}
+			return m_hLoginHandle.longValue() == 0? false:true;
+		} else if ("192.168.1.17".equals(m_strIp)) {
+			m_17hLoginHandle=netsdk.CLIENT_LoginWithHighLevelSecurity(pstInParam, pstOutParam);
+			if(m_17hLoginHandle.longValue() == 0) {
+				System.err.printf("Login Device[%s] Port[%d]Failed. %s\n", m_strIp, m_nPort, ToolKits.getErrorCodePrint());
+			} else {
+				System.out.println("Login Success [ " + m_strIp + " ]");
+			}
+			return m_17hLoginHandle.longValue() == 0? false:true;
+		} else if ("192.168.1.26".equals(m_strIp)) {
+			m_26hLoginHandle=netsdk.CLIENT_LoginWithHighLevelSecurity(pstInParam, pstOutParam);
+			if(m_26hLoginHandle.longValue() == 0) {
+				System.err.printf("Login Device[%s] Port[%d]Failed. %s\n", m_strIp, m_nPort, ToolKits.getErrorCodePrint());
+			} else {
+				System.out.println("Login Success [ " + m_strIp + " ]");
+			}
+			return m_26hLoginHandle.longValue() == 0? false:true;
+		} else if ("192.168.1.28".equals(m_strIp)) {
+			m_28hLoginHandle=netsdk.CLIENT_LoginWithHighLevelSecurity(pstInParam, pstOutParam);
+			if(m_28hLoginHandle.longValue() == 0) {
+				System.err.printf("Login Device[%s] Port[%d]Failed. %s\n", m_strIp, m_nPort, ToolKits.getErrorCodePrint());
+			} else {
+				System.out.println("Login Success [ " + m_strIp + " ]");
+			}
+			return m_28hLoginHandle.longValue() == 0? false:true;
+		} else if ("192.168.1.29".equals(m_strIp)) {
+			m_29hLoginHandle=netsdk.CLIENT_LoginWithHighLevelSecurity(pstInParam, pstOutParam);
+			if(m_29hLoginHandle.longValue() == 0) {
+				System.err.printf("Login Device[%s] Port[%d]Failed. %s\n", m_strIp, m_nPort, ToolKits.getErrorCodePrint());
+			} else {
+				System.out.println("Login Success [ " + m_strIp + " ]");
+			}
+			return m_29hLoginHandle.longValue() == 0? false:true;
+		}
+
+		return false;
 	}
 	
 	/**

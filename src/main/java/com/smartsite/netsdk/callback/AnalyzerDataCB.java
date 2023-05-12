@@ -1,17 +1,28 @@
 package com.smartsite.netsdk.callback;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.smartsite.netsdk.common.ResultBean;
 import com.smartsite.netsdk.lib.NetSDKLib;
 import com.smartsite.netsdk.lib.ToolKits;
+import com.smartsite.netsdk.listener.ApplicationEventListener;
+import com.smartsite.netsdk.service.MinioService;
 import com.smartsite.netsdk.utils.HttpClientUtil;
 import com.sun.jna.Pointer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * @author 信息化部-王浩
@@ -26,11 +37,20 @@ public class AnalyzerDataCB implements NetSDKLib.fAnalyzerDataCallBack {
      */
     @Value("${accessControlRecordsUrl}")
     private String accessControlRecordsUrl;
+
+    /**
+     * 门禁同步
+     */
+    @Value("${transVideoAlarmSaveDataUrl}")
+    private String transVideoAlarmSaveDataUrl;
+
+    @Resource
+    private MinioService minioService;
+
     @Override
     public int invoke(NetSDKLib.LLong lAnalyzerHandle, int dwAlarmType,
                       Pointer pAlarmInfo, Pointer pBuffer, int dwBufSize,
                       Pointer dwUser, int nSequence, Pointer reserved) {
-        System.out.println("AnalyzerDataCB.invoke method zhixingl");
         if (lAnalyzerHandle.longValue() == 0 || pAlarmInfo == null) {
             return -1;
         }
@@ -57,22 +77,137 @@ public class AnalyzerDataCB implements NetSDKLib.fAnalyzerDataCallBack {
             String emOpenMethod = getEmOpenMethod(msg.emOpenMethod);
             System.out.printf("开门方式：%s\n", emOpenMethod);
 
+            String szSection = new String(msg.szSection, StandardCharsets.UTF_8);
+            System.out.printf("部门：%s\n",szSection);
+            String szClassNumberEx = new String(msg.szClassNumberEx, StandardCharsets.UTF_8);
+            System.out.printf("班组：%s\n",szClassNumberEx);
+
+            NetSDKLib.DEV_ACCESS_CTL_CUSTOM_WORKER_INFO stuCustomWorkerInfo = msg.stuCustomWorkerInfo;
+            String szWorkerTypeID = new String(stuCustomWorkerInfo.szWorkerTypeID, StandardCharsets.UTF_8);
+            System.out.printf("工种id：%s\n",szWorkerTypeID);
+            String szWorkerTypeName = new String(stuCustomWorkerInfo.szWorkerTypeName, StandardCharsets.UTF_8);
+            System.out.printf("工种名称：%s\n",szWorkerTypeName);
+
+            for (NetSDKLib.DEV_ACCESS_CTL_IMAGE_INFO devAccessCtlImageInfo : msg.stuImageInfo) {
+                int emType = devAccessCtlImageInfo.emType;
+                if (emType == -1) {
+                    System.out.print("未知");
+                } else if (emType == 0) {
+                    System.out.print("本地人脸图库");
+                } else if (emType == 1) {
+                    System.out.print("拍摄场景抠图");
+                } else {
+                    System.out.print("人脸抠图");
+                }
+            }
+
             int emEventType = msg.emEventType;
             JSONObject jsonObject = new JSONObject();
+            System.out.println("emEventType = " + emEventType);
             if (1 == emEventType) {
                 jsonObject.put("describe","进门");
+                System.out.print("进门");
             } else if (2 == emEventType) {
                 jsonObject.put("describe","出门");
+                System.out.print("出门");
             }
 
             jsonObject.put("openMode",emOpenMethod);
             jsonObject.put("userId",szUserId);
             jsonObject.put("userName",szCardName);
 
-            HttpClientUtil.httpPost(accessControlRecordsUrl,jsonObject);
+//            HttpClientUtil.httpPost(accessControlRecordsUrl,jsonObject);
 
+            //工装(安全帽/工作服等)检测事件
+        } else if (dwAlarmType == NetSDKLib.EVENT_IVS_WORKCLOTHES_DETECT) {
+            logger.info("监听到工装(安全帽/工作服等)检测事件了");
+            JSONObject alarmJSONObject = new JSONObject();
+
+            if (lAnalyzerHandle.equals(ApplicationEventListener.m_17hAttachHandle) ) {
+                alarmJSONObject.put("position","192.168.1.17");
+                System.out.println("position：192.168.1.17");
+            } else if (lAnalyzerHandle.equals(ApplicationEventListener.m_26hAttachHandle)) {
+                alarmJSONObject.put("position","192.168.1.26");
+                System.out.println("position：192.168.1.26");
+            } else if (lAnalyzerHandle.equals(ApplicationEventListener.m_28hAttachHandle)) {
+                alarmJSONObject.put("position","192.168.1.28");
+                System.out.println("position：192.168.1.28");
+            } else if (lAnalyzerHandle.equals(ApplicationEventListener.m_29hAttachHandle)) {
+                alarmJSONObject.put("position","192.168.1.29");
+                System.out.println("position：192.168.1.29");
+            } else {
+                alarmJSONObject.put("position","未知");
+                System.out.println("position：未知");
+            }
+
+            String path = "/app/pic";
+            NetSDKLib.DEV_EVENT_WORKCLOTHES_DETECT_INFO msg = new NetSDKLib.DEV_EVENT_WORKCLOTHES_DETECT_INFO();
+            ToolKits.GetPointerData(pAlarmInfo, msg);
+            int nAlarmType = msg.nAlarmType;
+            if (nAlarmType == 0) {
+                System.out.println("检测类别：未知");
+                alarmJSONObject.put("type","未知");
+            } else if (nAlarmType == 1) {
+                System.out.println("检测类别：防护服不规范");
+                alarmJSONObject.put("type","防护服不规范");
+            } else if (nAlarmType == 2) {
+                System.out.println("检测类别：工作服不规范");
+                alarmJSONObject.put("type","工作服不规范");
+            } else if (nAlarmType == 3) {
+                System.out.println("检测类别：安全帽不规范");
+                alarmJSONObject.put("type","安全帽不规范");
+            } else if (nAlarmType == 4) {
+                System.out.println("检测类别：安全帽和工作服不规范");
+                alarmJSONObject.put("type","安全帽和工作服不规范");
+            }
+
+            NetSDKLib.NET_TIME_EX ex =  msg.UTC;
+            String s = ex.toString();
+            System.out.println("监测时间=" + s);
+            alarmJSONObject.put("time",s);
+
+            NetSDKLib.SCENE_IMAGE_INFO stuSceneImage = msg.stuSceneImage;
+            if (stuSceneImage != null) {
+                //偏移量
+                int nOffSet = stuSceneImage.nOffSet;
+                System.out.printf("全景大图信息nOffSet：%d\n", nOffSet);
+                //图片大小
+                int nLength = stuSceneImage.nLength;
+                System.out.printf("全景大图信息图片大小：%d\n", nLength);
+                //在上传图片数据中的图片序号
+                int nIndexInData = stuSceneImage.nIndexInData;
+                System.out.printf("全景大图信息nIndexInData：%d\n", nIndexInData);
+
+                //将图片保存到本地
+                System.out.println("new byte[nLength]");
+                byte[] byteArray = pBuffer.getByteArray(nOffSet, nLength);
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
+                System.out.println("pBuffer.read");
+                String strFileName = path + "//" + System.currentTimeMillis() + "quanjing_snap.jpg";
+                try{
+                    BufferedImage snapBufferedImage = ImageIO.read(byteArrayInputStream);
+                    if (snapBufferedImage == null) {
+                        System.out.println("BufferedImage read = ImageIO.read(byteArrayInputStream); == null");
+                    } else {
+                        ImageIO.write(snapBufferedImage,"jpg",new File(strFileName));
+                    }
+
+                    File uploadPic = new File(strFileName);
+                    MultipartFile cMultiFile = new MockMultipartFile("file", uploadPic.getName(), null, new FileInputStream(uploadPic));
+                    ResultBean resultBean = minioService.uploadFile(cMultiFile);
+                    Map<String,Object> minioMap = (Map<String, Object>)resultBean.get("data");
+                    Object fileName = minioMap.get("fileName");
+                    System.out.println("picName = " + fileName);
+                    alarmJSONObject.put("pic",fileName);
+                    boolean b = uploadPic.delete();
+                }catch (Exception e) {
+                    e.printStackTrace();;
+                }
+            } else {
+                System.out.print("全景大图信息为空");
+            }
+            HttpClientUtil.httpPost(transVideoAlarmSaveDataUrl,alarmJSONObject);
         }
-
         return 0;
     }
 

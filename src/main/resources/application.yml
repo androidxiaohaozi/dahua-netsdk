@@ -17,6 +17,9 @@ cardManageDeleteUrl: http://bimzcjh.cn:9002/cardManage/delete
 #同步门禁出入记录
 accessControlRecordsUrl: http://bimzcjh.cn:9002/accessControlRecords/add
 
+#同步视频监控报警
+transVideoAlarmSaveDataUrl: http://bimzcjh.cn:8002/transVideoAlarmSaveData/add
+
 # Sa-Token-Quick-Login 配置
 sa:
   # 登录账号

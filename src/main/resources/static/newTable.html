@@ -260,34 +260,112 @@
     <!-- 修改界面 -->
     <el-dialog title="修改日常检查" :visible.sync="Mask1" width="96%" :close-on-click-modal="false" class="dialog-style">
         <el-form ref="addForm" :model="form" :rules="rules" label-width="20%">
-            <el-form-item label="时间：" prop="inspectionTime">
+
+            <el-form-item label="序号：" prop="serialNumber">
+                <el-input v-model="form.serialNumber"></el-input>
+            </el-form-item>
+
+            <el-form-item label="卡号：" prop="cardNo">
+                <el-input v-model="form.cardNo"></el-input>
+            </el-form-item>
+
+            <el-form-item label="用户id：" prop="userId">
+                <el-input v-model="form.userId"></el-input>
+            </el-form-item>
+
+            <el-form-item label="卡名：" prop="cardName">
+                <el-input v-model="form.cardName"></el-input>
+            </el-form-item>
+
+            <el-form-item label="卡密码：" prop="cardPasswd">
+                <el-input v-model="form.cardPasswd"></el-input>
+            </el-form-item>
+
+            <el-form-item label="卡状态：" prop="cardStatus">
+                <el-select v-model="form.cardStatus">
+                    <el-option value="-1" label="未知">未知</el-option>
+                    <el-option value="0" label="正常">正常</el-option>
+                    <el-option value="1" label="正常">挂失</el-option>
+                    <el-option value="2" label="正常">注销</el-option>
+                    <el-option value="3" label="正常">冻结</el-option>
+                    <el-option value="4" label="正常">欠费</el-option>
+                    <el-option value="5" label="正常">逾期</el-option>
+                    <el-option value="6" label="正常">预欠费</el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="卡状态名称：" prop="cardStatusName">
+                <el-input v-model="form.cardStatusName"></el-input>
+            </el-form-item>
+
+            <el-form-item label="卡类型：" prop="cardType">
+                <el-select v-model="form.cardType">
+                    <el-option value="-1" label="未知">未知</el-option>
+                    <el-option value="0" label="正常">已办卡</el-option>
+                    <el-option value="1" label="正常">一般卡</el-option>
+                    <el-option value="2" label="正常">VIP卡</el-option>
+                    <el-option value="3" label="正常">来宾卡</el-option>
+                    <el-option value="4" label="正常">黑名单卡</el-option>
+                    <el-option value="5" label="正常">胁迫卡</el-option>
+                    <el-option value="6" label="正常">巡检卡</el-option>
+                    <el-option value="7" label="正常">母卡</el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="卡类型名称：" prop="cardTypeName">
+                <el-input v-model="form.cardTypeName"></el-input>
+            </el-form-item>
+
+            <el-form-item label="使用次数，仅当卡类型为来宾卡时有效：" prop="useTimes">
+                <el-input v-model="form.useTimes"></el-input>
+            </el-form-item>
+
+            <el-form-item label="是否首卡：" prop="firstEnter">
+                <el-select v-model="form.firstEnter">
+                    <el-option value="0" label="不是">不是</el-option>
+                    <el-option value="1" label="是">是</el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="是否有效：" prop="enable">
+                <el-select v-model="form.enable">
+                    <el-option value="0" label="不是">不是</el-option>
+                    <el-option value="1" label="是">是</el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="有效开始时间：" prop="startTime">
                 <el-date-picker
-                        v-model="form.inspectionTime"
+                        v-model="form.startTime"
                         type="datetime"
                         format="yyyy-MM-dd HH:mm:ss"
                         value-format="yyyy-MM-dd HH:mm:ss"
                         placeholder="选择日期时间">
                 </el-date-picker>
             </el-form-item>
-            <el-form-item label="单位：" prop="company">
-                <el-input v-model="form.company"></el-input>
+
+            <el-form-item label="有效结束时间：" prop="endTime">
+                <el-date-picker
+                        v-model="form.endTime"
+                        type="datetime"
+                        format="yyyy-MM-dd HH:mm:ss"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        placeholder="选择日期时间">
+                </el-date-picker>
             </el-form-item>
-            <el-form-item label="人员：" prop="personnel">
-                <el-input v-model="form.personnel"></el-input>
+
+            <el-form-item label="记录集编号：" prop="recordNo">
+                <el-input v-model="form.recordNo"></el-input>
             </el-form-item>
-            <el-form-item label="职务：" prop="post">
-                <el-input v-model="form.post"></el-input>
+
+            <el-form-item label="工种：" prop="typeOfWork">
+                <el-input v-model="form.typeOfWork"></el-input>
             </el-form-item>
-            <el-form-item label="重点检查单位：" prop="keyInspectionPoints">
-                <el-input v-model="form.keyInspectionPoints"></el-input>
+            <el-form-item label="分包：" prop="subpackage">
+                <el-input v-model="form.subpackage"></el-input>
             </el-form-item>
-            <el-form-item label="内容及问题：" prop="contentsProblems">
-                <el-input v-model="form.contentsProblems"></el-input>
-            </el-form-item>
-            <el-form-item label="备注：" prop="inspectionRemark">
-                <el-input v-model="form.inspectionRemark"></el-input>
-            </el-form-item>
-            <el-form-item prop="ffileList" label="现场照片：">
+
+            <el-form-item prop="fileList" label="人员照片：">
                 <el-upload :action="uploadFileUrl" multiple list-type="picture-card" :data="fileData" name="file"
                            accept="image/jpeg,image/png,image/jpg" :on-preview="handlePictureCardPreview"
                            :file-list="ffileList" :on-remove="handleRemove"
@@ -298,15 +376,16 @@
                     </template>
                 </el-upload>
             </el-form-item>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
+            <span slot="footer" class="dialog-footer">
                 <el-button size="mini" @click="uploadClosed">取 消</el-button>
                 <el-button size="mini" type="primary" @click="changeCrrunt">确 定</el-button>
             </span>
+        </el-form>
     </el-dialog>
     <el-dialog :visible.sync="dialogVisible">
         <img width="100%" :src="dialogImageUrl" alt="">
     </el-dialog>
+
 
     <!-- mobile查看全部-->
     <el-dialog title="查看全部" :visible.sync="Mask6" width="96%" :close-on-click-modal="false" class="dialog-style">
