@@ -13,10 +13,9 @@ import java.util.Map;
  * 设备工具类
  * (暂时使用静态数据，实际使用时需要使用数据库中的数据)
  *
- * @author Yan Xu
- * @version 1.0
- * @date 2021/8/6
- * Copyright © goodits
+ * @author 信息化部-王浩
+ * @description 功能描述
+ * @create 2023/4/27 16:15
  */
 @Slf4j
 public class DeviceUtils {

@@ -2,9 +2,9 @@ package com.smartsite.netsdk.utils;
 
 /**
  * 自定义服务异常
- * @author Yan Xu
- * @version 1.0
- * @date 2023/4/19
+ * @author 信息化部-王浩
+ * @description 功能描述
+ * @create 2023/4/27 16:15
  */
 public class ServiceException extends RuntimeException{
 
