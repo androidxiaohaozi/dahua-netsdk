@@ -29,6 +29,15 @@ public class DeviceUtils {
         DEVICE_DTO_MAP.put(deviceDto.getId(), deviceDto);
         DeviceDto deviceDto1 = new DeviceDto("2", "192.168.1.246", 37777, "admin", "a1234567");
         DEVICE_DTO_MAP.put(deviceDto1.getId(), deviceDto1);
+
+        DeviceDto deviceDto2 = new DeviceDto("3", "192.168.1.17", 37777, "admin", "a1234567");
+        DEVICE_DTO_MAP.put(deviceDto2.getId(), deviceDto2);
+        DeviceDto deviceDto3 = new DeviceDto("4", "192.168.1.26", 37777, "admin", "a1234567");
+        DEVICE_DTO_MAP.put(deviceDto3.getId(), deviceDto3);
+        DeviceDto deviceDto4 = new DeviceDto("5", "192.168.1.28", 37777, "admin", "a1234567");
+        DEVICE_DTO_MAP.put(deviceDto4.getId(), deviceDto4);
+        DeviceDto deviceDto5 = new DeviceDto("6", "192.168.1.29", 37777, "admin", "a1234567");
+        DEVICE_DTO_MAP.put(deviceDto5.getId(), deviceDto5);
     }
 
     public static boolean login(String deviceNo) {
